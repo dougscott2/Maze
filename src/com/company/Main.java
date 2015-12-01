@@ -19,14 +19,14 @@ public class Main {
         }
         return rooms;
     }
-
     static ArrayList<Room> possibleNeighbors (ArrayList<ArrayList<Room>> rooms, int row, int col){
         ArrayList<Room> neighbors = new ArrayList<>();
-
         if (row > 0) neighbors.add(rooms.get(row-1).get(col));
         if (row < SIZE-1) neighbors.add(rooms.get(row+1).get(col));
         if (col > 0) neighbors.add(rooms.get(row).get(col-1));
         if (col < SIZE-1 ) neighbors.add(rooms.get(row).get(col+1));
+
+
 
         return neighbors;
     }
@@ -37,11 +37,14 @@ public class Main {
                     return !room.wasVisited;
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
+
         if (neighbors.size() > 0){
             Random r = new Random();
             int index = r.nextInt(neighbors.size());
             return neighbors.get(index);
         }
+
+
         return null;
     }
     static void tearDownWall (Room oldRoom, Room newRoom){
@@ -63,27 +66,52 @@ public class Main {
     static boolean createMaze (ArrayList<ArrayList<Room>> rooms, Room room){
         room.wasVisited = true;
         Room nextRoom = randomNeighbor(rooms, room.row, room.col);
-        if (nextRoom == null){
-            return false;
-        }
+            if (nextRoom == null) {
+                boolean tempBool = false;
+                for (ArrayList<Room> roomList : rooms){
+                    for (Room tempRoom : roomList){
+                        if (tempRoom.isEnd){
+                            tempBool = true;
+                        }
+                    }
+                }
+                if(!tempBool){
+                    room.isEnd = true;
+                }
+
+                return false;
+            }
+
         tearDownWall(room, nextRoom);
 
         while (createMaze(rooms, nextRoom)){
+
         }
         return true;
     }
-
     public static void main(String[] args) {
         ArrayList<ArrayList<Room>> rooms = createRooms();
         createMaze(rooms, rooms.get(0).get(0));
+        rooms.get(0).get(0).isStart = true;
+       // rooms.get(9).get(9).isEnd = true;
+
         for (ArrayList<Room> roomRow : rooms){
             System.out.print(" _");
         }
         System.out.println();
         for (ArrayList<Room> roomRow : rooms){
+
             System.out.print("|");
             for (Room room : roomRow){
+
                 String s1 = room.hasBottom ? "_" : " ";
+                if (room.isStart){
+                    s1 ="o";
+                }
+
+                if (room.isEnd){
+                    s1 = "x";
+                }
                 String s2 = room.hasRight ? "|" : " ";
                 System.out.print(s1 + s2);
             }
